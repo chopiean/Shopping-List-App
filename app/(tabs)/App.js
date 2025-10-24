@@ -1,89 +1,76 @@
 import React, { useState } from "react";
-import {
-  FlatList,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { FlatList, View } from "react-native";
+import { Button, Header, Icon, Input, ListItem } from "react-native-elements";
 
 export default function App() {
-    const [item, setItem] = useState("")
-    const [list, setList] = useState([])
+  const [product, setProduct] = useState("");
+  const [amount, setAmount] = useState("");
+  const [items, setItems] = useState([]);
 
-    const addItem = () => {
-        if (item.trim() === "") return
-        setList([...list, { key: item}])
-        setItem("")
+  const addItem = () => {
+    if (product && amount) {
+      setItems([...items, { id: Date.now().toString(), product, amount }]);
+      setProduct("");
+      setAmount("");
     }
+  };
 
-    const clearList = () => {
-        setList([])
-    }
+  const deleteItem = (id) => {
+    setItems(items.filter((item) => item.id !== id));
+  };
+  return (
+    <View style={{ flex: 1 }}>
+      <Header
+        centerComponent={{
+          text: "SHOPPING LIST",
+          style: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+        }}
+        containerStyle={{ backgroundColor: "#2196F3" }}
+      />
 
-    return (
-        <SafeAreaView style={styles.container}>
-          <TextInput
-            style={styles.input}
-            placeholder="Type an item"
-            value={item}
-            onChangeText={setItem}
-          />
-    
-          <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.button} onPress={addItem}>
-              <Text style={styles.buttonText}>ADD</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={clearList}>
-              <Text style={styles.buttonText}>CLEAR</Text>
-            </TouchableOpacity>
-          </View>
-    
-          <Text style={styles.listTitle}>Shopping List</Text>
-    
-          <FlatList
-            data={list}
-            renderItem={({ item }) => (
-              <Text style={styles.listItem}>{item.key}</Text>
-            )}
-          />
-        </SafeAreaView>
-    );
+      <View style={{ padding: 10 }}>
+        <Input
+          label="PRODUCT"
+          placeholder="Product"
+          value={product}
+          onChangeText={setProduct}
+        />
+
+        <Input
+          label="AMOUNT"
+          placeholder="Amount"
+          value={amount}
+          onChangeText={setAmount}
+        />
+
+        <Button
+          title=" SAVE"
+          icon={
+            <Icon name="save" type="font-awesome" color="white" size={16} />
+          }
+          onPress={addItem}
+          buttonStyle={{ backgroundColor: "#2196F3", borderRadius: 5 }}
+          containerStyle={{ width: 150, alignSelf: "center", marginBottom: 15 }}
+        />
+
+        <FlatList
+          data={items}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <ListItem bottomDivider>
+              <ListItem.Content>
+                <ListItem.Title>{item.product}</ListItem.Title>
+                <ListItem.Subtitle>{item.amount}</ListItem.Subtitle>
+              </ListItem.Content>
+              <Icon
+                name="delete"
+                color="red"
+                onPress={() => deleteItem(item.id)}
+              />
+            </ListItem>
+          )}
+        />
+      </View>
+    </View>
+  );
 }
-
-const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20, alignItems: "center" },
-    input: {
-      borderWidth: 1,
-      borderColor: "#ccc",
-      borderRadius: 5,
-      width: "100%",
-      padding: 10,
-      marginBottom: 12,
-      fontSize: 16,
-      marginTop: 10,
-      marginLeft: 10,
-    },
-    buttonRow: {
-      flexDirection: "row",
-      marginBottom: 20,
-      gap: 10,
-    },
-    button: {
-      backgroundColor: "black",
-      paddingVertical: 10,
-      paddingHorizontal: 18,
-      borderRadius: 5,
-      marginTop: 20,
-    },
-    buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
-    listTitle: {
-      fontSize: 18,
-      fontWeight: "bold",
-      color: "black",
-      marginTop: 6,
-    },
-    listItem: { fontSize: 16, paddingVertical: 4 },
-  });
